@@ -1,0 +1,25 @@
+질문 
+
+real time 개발자는 다양한 처리 시간을 고려해서 여러 개의 서비스를 개발해놓아야한다고 한 의미?
+
+extension interface 가 있는 이유? 제대로 못들음
+
+acceptor-connector 
+
+싱글톤 패턴에서의 두 부분 정확히 어떤 곳에서 어떻게 문제가 나는 건지
+
+reactor 패턴 질문 - demultiplexer?
+
+proactor - io작업이 있는지 체크 후 바로 커널에 던지는건지 
+
+reactor 와 proactor 는 모두 이벤트 처리라서 비동기 인것 같은데, 어떤 기준으로 구분해서 두는건지?
+
+proactor 와 active object 의 차이점 다시 한번
+
+tss 도 간단히 다시 한번
+
+히스토그램에선 음수가 안되는 이유?
+
+hyperloglog 계산으로 발전한 이유? - 제대로 못들었음
+
+t-digest 는 음수 지원 말고는 히스토그램과 동일?? 아니면 ddsketch 처럼 동적으로 범위 가능?
