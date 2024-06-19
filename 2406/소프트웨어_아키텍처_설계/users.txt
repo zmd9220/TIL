@@ -1,0 +1,4 @@
+name,email,password
+안병진,byeongjin.an@lotte.net,pa11
+홍길동,test@gmail.com,pw11
+김씨,seoul@gmail.com,pw1123!
