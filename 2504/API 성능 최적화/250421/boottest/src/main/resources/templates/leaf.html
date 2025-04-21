@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<div>div test1</div>
+	<div>div test2</div>
+	<span>span test1</span>
+	<span>span test2</span>
+	<div>헬로:<span th:text="${hello}"></span></div>
+	<div th:if="${user=='kim'}">안녕 kim</div> <!-- 최종적으로 변수를 데이터로 바꿔서 던짐 -->
+	<div th:if="${user=='lee'}">안녕 lee</div>
+	
+	<div th:switch="${user}">
+		<div th:case="kim">김 입니다.</div>
+		<div th:case="lee">이 입니다.</div>
+		<div th:case="*">기타등등</div>
+	</div>
+	<ul>
+		<li>사과</li>
+		<li>딸기</li>
+	</ul>
+	
+	<!-- 반복문 java의 for(Movie movie : movies) 와 유사 -->
+	<ul>
+		<li th:each="movie : ${movies}">
+			<img th:src="${movie.poster}" width="200" height="200">
+			<span th:text="${movie.title}"></span> - <span th:text="${movie.director}"></span>
+		</li>
+	</ul>
+</body>
+</html>

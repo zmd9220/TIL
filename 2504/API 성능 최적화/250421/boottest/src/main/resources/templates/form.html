@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<h1>입력양식</h1>
+	<!-- 별도로 method 입력하지 않으면 기본값은 get -->
+	<!-- /person?name=홍길동&age=20&birth=1999-10-12 -->
+	<form action="/person" method="get" target="myi">
+		<!-- for label이 어디에 사용되는지 id와 매핑해서 표기 = 안해도 되지만 웹 표준이긴함 + 유지보수 용이 -->
+		<label for="name">이름:</label> 
+		<input type="text" id="name" name="name"><br>
+		<label>나이:</label>
+		<input type="number" name="age"><br>
+		<label>생일:</label>
+		<input type="date" name="birth"><br>
+		<button>확인</button>
+	</form>
+	
+	<iframe name="myi" width="100%", height="500" frameborder="0"></iframe>
+	
+</body>
+</html>
