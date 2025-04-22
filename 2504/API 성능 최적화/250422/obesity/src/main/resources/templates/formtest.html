@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+	<link rel="stylesheet" href="/css/my.css"/>
+</head>
+<body>
+	<form action="/formaction">
+		<label>이름:</label>
+		<input type="text"><br>		
+		<label>나이:</label>
+		<input type="number" min="0" max="100"><br>
+		<label>생일:</label>
+		<input type="date"><br>
+		<label>시간:</label>
+		<input type="time"><br>
+		<hr>
+		<label>전화번호:</label>
+		<input type="tel" pattern="\d{3}-\d{3,4}-\d{4}" placeholder="000-0000-0000형식입력"><br> <!-- \d{3} 숫자 3자리 패턴 000-000(0)-0000 -->
+		<hr>
+		<fieldset>
+			<legend>색상</legend>
+			<label>빨강</label>
+			<input type="radio" name="color" value="빨강">
+			<label>파랑</label>
+			<input type="radio" name="color" value="파랑">
+			<label>노랑</label>
+			<input type="radio" name="color" value="노랑">
+		</fieldset>
+		<fieldset>
+			<legend>취미</legend>
+			<label>낚시</label>
+			<input type="checkbox" name="hobby" value="낚시">
+			<label>골프</label>
+			<input type="checkbox" name="hobby" value="골프">
+			<label>영화</label>
+			<input type="checkbox" name="hobby" value="영화">
+		</fieldset>
+		
+		<select name="company">
+			<option value="회사1">회사1</option>
+			<option value="회사2">회사2</option>
+			<option value="회사3">회사3</option>
+		</select>
+		<br>
+		<label>이메일:</label>
+		<input type="email">
+		<br>
+		<textarea rows="4" cols="100"></textarea> <!-- 세로는 rows 이상으로 줄을 생성하면 자동으로 스크롤생성이됨 -->
+		<br>
+		
+		<button>확인</button>
+	</form>
+</body>
+</html>

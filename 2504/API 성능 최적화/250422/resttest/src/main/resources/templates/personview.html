@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+	<script>
+		function callperson(){
+			// JS ajax 통신
+			// obj 예시 = [{"name":"aaa", "age":20}]
+			fetch("/api/persons")
+			.then(res => res.json()) // 서버에서 보내는 res는 문자열임 그래서 response 객체(위의 obj 같이옴)에 데이터 부분을 json 객체로 변환
+			.then(data => renderTable(data)) // 위의 res.json() = data라는 임시 이름의 promise 객체를 반환하므로 해당 데이터를 담아서 함수 실행
+		}
+		function renderTable(data){
+			// a = 10, s = 'abc', str = `a=${a} s=${s}` -> console.log(str) a=10, s=abc
+			tbody = document.getElementById("useTableBody")
+			tbody.innerHTML = '' // 기존에 데이터 있으면 초기화 (클리어)
+			console.log(data)
+			for(n of data){
+				console.log(n.name, n.age)
+				tr = document.createElement('tr')
+				tr.innerHTML = `
+					<td>${n.name}</td>
+					<td>${n.age}</td>
+					`
+				tbody.appendChild(tr)
+			}
+		}
+
+	</script>
+</head>
+<body>
+	<h1>person data</h1>
+	<button onclick="callperson()">확인</button>
+	<table>
+		<thead>
+			<tr><th>이름</th><th>나이</th></tr>
+		</thead>
+		<tbody id="useTableBody">
+		</tbody>
+	</table>
+</body>
+</html>
