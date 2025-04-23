@@ -18,6 +18,13 @@
 
 - [@autowired 생성자](https://www.google.com/search?q=@autowired+%EC%83%9D%EC%84%B1%EC%9E%90&sca_esv=ad45493ffd201e24&ei=ousGaIvSOeek2roP2Z27uQ0&start=10&sa=N&sstk=Af40H4Uf-XPnFCqkGMQ6-o6qUXKSP1IHFMPbbr07i-84BG2k3mB6rTMN7ktKusCoiYEqsPFk7aWAHx9ujWr9If6CW9xGyhjjrrhukQ&ved=2ahUKEwiLq5zIueqMAxVnklYBHdnOLtcQ8tMDegQIJhAE&biw=929&bih=865&dpr=1)
 
+- [bean 생명주기](https://dev-coco.tistory.com/170)
+
+- https://doing7.tistory.com/11
+- https://www.google.com/search?q=controller+return&oq=co&gs_lcrp=EgZjaHJvbWUqBggAEEUYOzIGCAAQRRg7MgYIARBFGDkyEwgCEC4YgwEYxwEYsQMY0QMYgAQyDQgDEAAYgwEYsQMYgAQyBggEEEUYPDIGCAUQRRg8MgYIBhBFGDwyBggHEEUYPNIBCDExNDNqMGo3qAIAsAIA&sourceid=chrome&ie=UTF-8
+- https://www.google.com/search?q=%EB%A0%88%EA%B1%B0%EC%8B%9C%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%EC%97%90+jpa+%EC%B6%94%EA%B0%80%ED%95%98%EA%B8%B0&oq=%EB%A0%88%EA%B1%B0%EC%8B%9C%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%EC%97%90+jpa+%EC%B6%94%EA%B0%80%ED%95%98%EA%B8%B0&gs_lcrp=EgZjaHJvbWUyBggAEEUYOTIHCAEQABjvBTIKCAIQABiABBiiBDIHCAMQABjvBTIKCAQQABiABBiiBDIKCAUQABiiBBiJBdIBCDU4MzdqMWo3qAIAsAIA&sourceid=chrome&ie=UTF-8
+- [복잡한 쿼리 jpa vs mybatis](https://www.google.com/search?q=%EB%B3%B5%EC%9E%A1%ED%95%9C+%EC%BF%BC%EB%A6%AC+jpa+vs+mybatis&sca_esv=b347d5207ca6dc52&ei=bxsHaLOFLPm3vr0PrJnKIA&ved=0ahUKEwjz-JWT5-qMAxX5m68BHayMEgQQ4dUDCBI&uact=5&oq=%EB%B3%B5%EC%9E%A1%ED%95%9C+%EC%BF%BC%EB%A6%AC+jpa+vs+mybatis&gs_lp=Egxnd3Mtd2l6LXNlcnAiH-uzteyeoe2VnCDsv7zrpqwganBhIHZzIG15YmF0aXMyBRAAGO8FMggQABiABBiiBDIFEAAY7wUyBRAAGO8FSPAiUIICWJAgcAR4AJABAJgBzgGgAcYMqgEGMS4xMS4xuAEDyAEA-AEBmAIEoALjAcICChAAGLADGNYEGEfCAgQQABgemAMAiAYBkAYDkgcDMi4yoAeCDrIHAzAuMrgH3AE&sclient=gws-wiz-serp)
+
 
 
 - 과제에서 어려웠던 점 (JS 활용이 어려웠음-각 기능 클릭마다 링크 변경하여 iframe에 적용, CSS 적용이 어려웠음)
@@ -413,5 +420,329 @@ fetch("/api/persons")
 # 오후
 
 
+
+## JPA 최적화 이어서
+
+![image-20250423134511734](API성능최적화_3일차.assets/image-20250423134511734.png)
+
+
+
+
+
+## API 응답 성능 개선
+
+- ![image-20250423134531773](API성능최적화_3일차.assets/image-20250423134531773.png)
+
+
+
+```properties
+# 캐시 설정
+spring.cache.type=caffeine
+spring.cache.caffeine.spec=maximumSize=500,expireAfterWrite=600s
+
+# 비동기 처리 설정
+spring.task.execution.pool.core-size=10
+spring.task.execution.pool.max-size=20
+spring.task.execution.pool.queue-capacity=500
+
+# 응답 압축 설정
+server.compression.enabled=true
+server.compression.mime-types=text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+server.compression.min-response-size=1KB
+# 1KB 이상일 때만 압축
+```
+
+
+
+```java
+package com.example.resttest.controller;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+@Controller
+public class UserController {
+	
+	@GetMapping
+	@Cacheable(value = "homeCache", key = "'home'") // 빈번한 요청이 오는 화면, 데이터의 경우 캐시 추가(메모리에 넣어둠)
+	@Async // CompletableFuture 타입으로 변경해서 보내야함, 비동기로 동시에 처리할 수 있도록 함
+	public CompletableFuture<String> index(Model model) {
+		return CompletableFuture.completedFuture("home");
+	}
+	
+	// server.compression.min-response-size=1KB 1KB 이상일 때만 압축
+	// f12 네트워크에서 수신 json 클릭 후 헤더에 gzip 압축 확인
+    @GetMapping("/large-json") // 응답 압축 예제
+    @ResponseBody
+    public List<Map<String, Object>> getLargeJson() {
+        List<Map<String, Object>> list = new ArrayList<>();
+        for (int i = 0; i < 1000; i++) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", i);
+            map.put("name", "User_" + i);
+            map.put("description", "이건 매우 긴 설명입니다. 데이터를 반복해서 길게 만들어서 gzip 압축 테스트를 해보겠습니다. ".repeat(5));
+            list.add(map);
+        }
+        return list;
+    }    
+    
+    @GetMapping("/stream")
+    @ResponseBody // 스트리밍 응답 예제, 청크단위 전송?, caffeine 캐시를 사용해야해서 의존성을 추가해야함
+    public ResponseEntity<StreamingResponseBody> streamData() {
+
+        StreamingResponseBody stream = outputStream -> {
+            // 스트리밍 데이터 처리
+            for (int i = 0; i < 1000; i++) {
+                outputStream.write(("Data " + i + "\n").getBytes()); // 바로 바로 body에 담아서 전송
+                outputStream.flush();  //바로 전송
+                //Thread.sleep(100);
+            }
+        };
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.TEXT_PLAIN);
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(stream);
+    }
+```
+
+
+
+- ![image-20250423140403539](API성능최적화_3일차.assets/image-20250423140403539.png)
+
+- ![image-20250423142902312](API성능최적화_3일차.assets/image-20250423142902312.png)
+- ![image-20250423142912426](API성능최적화_3일차.assets/image-20250423142912426.png)
+- ![image-20250423142923656](API성능최적화_3일차.assets/image-20250423142923656.png)
+- ![image-20250423142935146](API성능최적화_3일차.assets/image-20250423142935146.png)
+- ![image-20250423143005536](API성능최적화_3일차.assets/image-20250423143005536.png)
+- ![image-20250423143039485](API성능최적화_3일차.assets/image-20250423143039485.png)
+
+
+
+- ![image-20250423143234355](API성능최적화_3일차.assets/image-20250423143234355.png)
+- ![image-20250423143241675](API성능최적화_3일차.assets/image-20250423143241675.png)
+- ![image-20250423143253001](API성능최적화_3일차.assets/image-20250423143253001.png)
+- ![image-20250423143601909](API성능최적화_3일차.assets/image-20250423143601909.png)
+
+
+
+- ![image-20250423143555818](API성능최적화_3일차.assets/image-20250423143555818.png)
+- ![image-20250423143617676](API성능최적화_3일차.assets/image-20250423143617676.png)
+- ![image-20250423143625588](API성능최적화_3일차.assets/image-20250423143625588.png)
+- ![image-20250423143633446](API성능최적화_3일차.assets/image-20250423143633446.png)
+- ![image-20250423143639934](API성능최적화_3일차.assets/image-20250423143639934.png)
+
+- ![image-20250423143654507](API성능최적화_3일차.assets/image-20250423143654507.png)
+- ![image-20250423143704793](API성능최적화_3일차.assets/image-20250423143704793.png)
+- ![image-20250423143711020](API성능최적화_3일차.assets/image-20250423143711020.png)
+
+- ![image-20250423143721124](API성능최적화_3일차.assets/image-20250423143721124.png)
+
+
+
+- ![image-20250423143741715](API성능최적화_3일차.assets/image-20250423143741715.png)
+- ![image-20250423144105918](API성능최적화_3일차.assets/image-20250423144105918.png)
+
+
+
+## 성능 테스트 (K6, jmeter)
+
+- ![image-20250423144208224](API성능최적화_3일차.assets/image-20250423144208224.png)
+- ![image-20250423144235407](API성능최적화_3일차.assets/image-20250423144235407.png)
+- ![image-20250423144245019](API성능최적화_3일차.assets/image-20250423144245019.png)
+
+
+
+
+
+### JMeter
+
+- ![image-20250423144849787](API성능최적화_3일차.assets/image-20250423144849787.png)
+
+- ![image-20250423144844192](API성능최적화_3일차.assets/image-20250423144844192.png)
+- ![image-20250423145058205](API성능최적화_3일차.assets/image-20250423145058205.png)
+- ![image-20250423145159555](API성능최적화_3일차.assets/image-20250423145159555.png)
+
+- ![image-20250423145211509](API성능최적화_3일차.assets/image-20250423145211509.png)
+- ![image-20250423145218317](API성능최적화_3일차.assets/image-20250423145218317.png)
+
+- ![image-20250423151732579](API성능최적화_3일차.assets/image-20250423151732579.png)
+
+- ![image-20250423151744071](API성능최적화_3일차.assets/image-20250423151744071.png)
+- 
+
+
+
+### Spring Actuator
+
+- ![image-20250423153525272](API성능최적화_3일차.assets/image-20250423153525272.png)
+- ![image-20250423153531141](API성능최적화_3일차.assets/image-20250423153531141.png)
+- ![image-20250423153536756](API성능최적화_3일차.assets/image-20250423153536756.png)
+- ![image-20250423153542154](API성능최적화_3일차.assets/image-20250423153542154.png)
+- ![image-20250423153550381](API성능최적화_3일차.assets/image-20250423153550381.png)
+- ![image-20250423153559379](API성능최적화_3일차.assets/image-20250423153559379.png)
+- ![image-20250423153604551](API성능최적화_3일차.assets/image-20250423153604551.png)
+- ![image-20250423153633516](API성능최적화_3일차.assets/image-20250423153633516.png)
+- ![image-20250423153640003](API성능최적화_3일차.assets/image-20250423153640003.png)
+- ![image-20250423153647108](API성능최적화_3일차.assets/image-20250423153647108.png)
+- ![image-20250423153653297](API성능최적화_3일차.assets/image-20250423153653297.png)
+
+- ![image-20250423153706332](API성능최적화_3일차.assets/image-20250423153706332.png)
+- ![image-20250423153714589](API성능최적화_3일차.assets/image-20250423153714589.png)
+- ![image-20250423153722094](API성능최적화_3일차.assets/image-20250423153722094.png)
+
+- ```properties
+  # spring actuator setting
+  management.endpoints.web.exposure.include=*
+  management.endpoint.health.show-details=always
+  management.endpoint.metrics.enabled=true
+  management.endpoint.prometheus.enabled=true
+  management.metrics.export.prometheus.enabled=true
+  management.endpoint.loggers.enabled=true
+  management.endpoint.env.enabled=true
+  management.endpoint.beans.enabled=true
+  management.endpoint.threaddump.enabled=true
+  management.endpoint.heapdump.enabled=true
+  ```
+
+```xml
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+```
+
+
+
+### Prometheus, Grafana 대시보드
+
+- ![image-20250423154806727](API성능최적화_3일차.assets/image-20250423154806727.png)
+- ![image-20250423154813860](API성능최적화_3일차.assets/image-20250423154813860.png)
+- ![image-20250423154905927](API성능최적화_3일차.assets/image-20250423154905927.png)
+- ![image-20250423154913500](API성능최적화_3일차.assets/image-20250423154913500.png)
+- ![image-20250423154920413](API성능최적화_3일차.assets/image-20250423154920413.png)
+
+- cd C:\Users\GD\Downloads\prometheus-3.3.0.windows-amd64
+
+- prometheus.exe --config.file=prometheus.yml
+
+- 대부분의 성능이슈 sql 쿼리 (DB 문제)
+
+
+
+- ![image-20250423163449432](API성능최적화_3일차.assets/image-20250423163449432.png)
+
+- ![image-20250423163457941](API성능최적화_3일차.assets/image-20250423163457941.png)
+- ![image-20250423163505038](API성능최적화_3일차.assets/image-20250423163505038.png)
+- ![image-20250423163518008](API성능최적화_3일차.assets/image-20250423163518008.png)
+
+
+
+- C:\Program Files\GrafanaLabs\grafana\bin
+- ![image-20250423164332421](API성능최적화_3일차.assets/image-20250423164332421.png)
+
+
+
+- [네이버 MYBOX](https://mybox.naver.com/#/share/url/detail?shareKey=I-XvckOSWeiKHjR8y8Z8UXI8wzt5_Sa3c7UdEn9-sLQE&resourceKey=aWxoYW5rfDM0NzI1OTY4NTk4Mzk0MDk3NDh8RHwxNjM1OTIzNQ)
+
+- 작동X
+
+- ![image-20250423172924370](API성능최적화_3일차.assets/image-20250423172924370.png)
+
+- 정상작동
+
+- ![image-20250423173130747](API성능최적화_3일차.assets/image-20250423173130747.png)
+
+
+
+- fetch join + batchsize
+
+- ```java
+  package com.example.resttest.model;
+  
+  import java.util.List;
+  
+  import org.hibernate.annotations.BatchSize;
+  
+  import jakarta.persistence.Entity;
+  import jakarta.persistence.FetchType;
+  import jakarta.persistence.GeneratedValue;
+  import jakarta.persistence.GenerationType;
+  import jakarta.persistence.Id;
+  import jakarta.persistence.JoinColumn;
+  import jakarta.persistence.ManyToOne;
+  import jakarta.persistence.Table;
+  import lombok.AllArgsConstructor;
+  import lombok.Getter;
+  import lombok.NoArgsConstructor;
+  import lombok.Setter;
+  
+  @Entity
+  @Table(name="orders") // Order 테이블은 중복될 수 있어서 이름 바꿈
+  @Getter
+  @Setter
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public class Order {
+  	// 행을 구분하는 PK 반드시 필요 (테이블 생성을 위해) 별도 구분자가 없을 경우 row 갯수 마다 자동 증가하는 ID를 키로 쓰면 됨	
+  	@Id
+  	@GeneratedValue(strategy = GenerationType.IDENTITY)
+  	private Long id;
+  	
+  	private String productName;
+  	private double price;
+  	
+  	@ManyToOne(fetch = FetchType.LAZY) // 여러 주문은 한 사람에게 적용 될 수 있음
+  	@BatchSize(size = 10)
+  	@JoinColumn(name = "person_id")
+  	private Person person;
+  }
+  ```
+
+- ```sql
+  select * from orders;
+  select * from person where id in (1,2,3,4,5...10);
+  select * from person where id in (11,12,13,14,15...20);
+  ```
+
+
+
+- ```java
+  package com.example.resttest.repository;
+  
+  import java.util.List;
+  import java.util.Optional;
+  
+  import org.springframework.data.jpa.repository.JpaRepository;
+  import org.springframework.data.jpa.repository.Query;
+  import org.springframework.data.repository.query.Param;
+  
+  import com.example.resttest.model.Order;
+  //fetch join 여러번 반복문을 한번에 처리해버림 (속도 향상)
+  public interface OrderRepository extends JpaRepository<Order, Long> {
+      @Query("SELECT o FROM Order o JOIN FETCH o.person WHERE  = :orderId")
+      Optional<Order> findOrderWithPerson(@Param("orderId") Long orderId);
+  
+      List<Order> findByPersonId(Long personId);
+      
+      @Query("SELECT o FROM Order o JOIN FETCH o.person")
+      List<Order> findAllWithPerson();
+      
+      @Query("SELECT o FROM Order o JOIN FETCH o.person p WHERE  = :personId")
+      List<Order> findByPersonIdWithPerson(@Param("personId") Long personId);
+  }
+  ```
 
 - 
