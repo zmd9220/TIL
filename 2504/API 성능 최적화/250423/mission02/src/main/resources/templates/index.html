@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>제품 상세 정보</title>
+  <link rel="stylesheet" href="/css/index.css" />
+  <script src="/js/autoresize.js"></script>
+</head>
+<body>
+  <h1>제품 상세 정보</h1>
+  <div id="btns">
+    <button onclick="changePage('/main')">메인</button>
+    <button onclick="changePage('/insertform')">입력</button>
+    <button onclick="changePage('/list')">보기</button>
+  </div>
+
+  <iframe id="myFrame" src="" width="100%" onload="resizeIframe()" style="border: none;"></iframe>
+</body>
+</html>
+
+<!-- <a href="/main" target="myi">메인</a> -->
+<!-- <!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<h1>제품 상세 정보</h1>
+
+	<div id="btns">
+	    <button onclick="document.getElementById('myFrame').src='/main'">메인</button>
+	    <button onclick="document.getElementById('myFrame').src='/insertform'">입력</button>
+	    <button onclick="document.getElementById('myFrame').src='/list'">보기</button>
+  	</div>
+
+	<iframe name="myi" id="myFrame" src="" width="100%" height="500px"></iframe>
+</body>
+</html> -->
+
+

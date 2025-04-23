@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script>
+	function fn(){
+		/* myname = document.getElementById('name') */
+/* 		myname.value =  '홍길동'
+		myname.value = '홍길동'
+		age.value = 30  */
+		// ajax 통신 (post)
+		fetch('/api/persons/1', {
+			method:'DELETE',
+		})
+		.then(response => response.text()) // 결과 받은 response 데이터(문자열)에서 데이터 부분을 text화(받은 데이터가 text라서)
+		.then(data => resultFn(data)) // 
+	}
+	function resultFn(data){
+		console.log(data)
+		show.innerHTML = data
+	}
+</script>
+</head>
+<body>
+	<h1>rest api delete</h1>
+	<hr>
+		<button onclick="fn()">입력</button>
+	<hr>
+	<div id="show"></div>
+</body>
+</html>

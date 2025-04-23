@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script>
+	function fn(){
+		/* myname = document.getElementById('name') */
+/* 		myname.value =  '홍길동'
+		myname.value = '홍길동'
+		age.value = 30  */
+		personData = {name:myname.value, age:age.value} // ''로 감싸도 되고 안 감싸도 됨
+		// ajax 통신 (post)
+		fetch('/api/persons/1', {
+			method:'PUT', // PUT = update
+			headers:{
+				'Content-Type':'application/json' // body에 실릴 타입 선언
+			},
+			body:JSON.stringify(personData) // 실제 데이터 넘길 json 객체 - 단 보내기 전에 문자열로 변환해서 보내야함
+		})
+		.then(response => response.json()) // 결과 받은 response 데이터(문자열)에서 데이터 부분을 json화
+		.then(data => resultFn(data)) // 위에서 json화 된 데이터를 처리 (resultFn 함수)
+	}
+	function resultFn(data){
+		console.log(data)
+		show.innerHTML = `<h3>이름:${data.name} 나이:${data.age} 수정됨</h3>`
+	}
+</script>
+</head>
+<body>
+	<h1>rest api update</h1>
+	<hr>
+		<label>이름:</label>
+		<input id="myname" type="text"><br>
+		<label>나이:</label>
+		<input id="age" type="number"><br>
+		<button onclick="fn()">입력</button>
+	<hr>
+	<div id="show"></div>
+</body>
+</html>
