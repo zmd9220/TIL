@@ -11,10 +11,14 @@
             "id": "c51086c93ee1131b",
             "type": "leaf",
             "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "그래프 뷰"
+              "type": "markdown",
+              "state": {
+                "file": "day2/2일차.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "2일차"
             }
           }
         ]
@@ -161,8 +165,10 @@
       "command-palette:명령어 팔레트 열기": false
     }
   },
-  "active": "52cb2fb8beb199a6",
+  "active": "c51086c93ee1131b",
   "lastOpenFiles": [
+    "day2/2일차.md",
+    "day2",
     "day1/1일차.assets/image-20250818144211166.png",
     "day1/1일차.assets/scode=mtistory2&fname=https%3A%2F%2Ft1.daumcdn.jpeg",
     "day1/1일차.assets/scode=mtistory2&fname=https%3A%2F%2Ft1.daumcdn-1755480340974-17.net%2Fcfile%2Ftistory%2F273955465518BB0C0E",
